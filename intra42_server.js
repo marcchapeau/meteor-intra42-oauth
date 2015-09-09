@@ -8,9 +8,9 @@ OAuth.registerService('intra42', 2, null, function (query) {
       id: identity.id,
       accessToken: OAuth.sealSecret(accessToken),
       email: identity.email,
-      username: identity.login
+      login: identity.login
     },
-    options: {profile: {name: identity.login}}
+    options: {profile: {name: identity.displayname}}
   };
 });
 
