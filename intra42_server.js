@@ -23,7 +23,7 @@ var getAccessToken = function (query) {
   if (!config)throw new ServiceConfiguration.ConfigError();
   var response;
   try {
-    response = HTTP.post('https://api.intrav2.42.fr/oauth/token', {
+    response = HTTP.post('https://api.intra.42.fr/oauth/token', {
         headers: {
           Accept: 'application/json',
           'User-Agent': userAgent
@@ -49,7 +49,7 @@ var getAccessToken = function (query) {
 
 var getIdentity = function   (accessToken) {
   try {
-    return HTTP.get('https://api.intrav2.42.fr/v2/me', {
+    return HTTP.get('https://api.intra.42.fr/v2/me', {
         headers: {
           'User-Agent': userAgent,
           Authorization: 'Bearer ' + accessToken
