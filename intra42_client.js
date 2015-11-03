@@ -19,7 +19,7 @@ Intra42.requestCredential = function (options, credentialRequestCompleteCallback
   var loginStyle = OAuth._loginStyle('intra42', config, options);
 
   var loginUrl =
-    'https://api.intrav2.42.fr/oauth/authorize' +
+    'https://api.intra.42.fr/oauth/authorize' +
     '?client_id=' + config.clientId +
     '&scope=' + flatScope +
     '&redirect_uri=' + OAuth._redirectUri('intra42', config) +
