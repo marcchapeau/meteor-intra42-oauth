@@ -1,6 +1,6 @@
 Template.configureLoginServiceDialogForIntra42.helpers({
   siteUrl: function () {
-    return Meteor.absoluteUrl();
+    return Meteor.absoluteUrl('', {secure: true});
   }
 });
 
