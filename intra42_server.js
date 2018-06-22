@@ -1,8 +1,16 @@
-Intra42 = {}
+import { OAuth } from 'meteor/oauth'
+import { Meteor } from 'meteor/meteor'
+import { ServiceConfiguration } from 'meteor/service-configuration'
+import { HTTP } from 'meteor/http'
 
-OAuth.registerService('intra42', 2, null, function (query) {
-  var accessToken = getAccessToken(query)
-  var identity = getIdentity(accessToken)
+const settings = Meteor.settings
+const app = settings.public && settings.public.intra42 && settings.public.intra42.app
+let name = 'intra42'
+if (app) name += `_${app}`
+
+OAuth.registerService(name, 2, null, function (query) {
+  const accessToken = getAccessToken(query)
+  const identity = getIdentity(accessToken)
   return {
     serviceData: {
       id: identity.id,
@@ -14,14 +22,13 @@ OAuth.registerService('intra42', 2, null, function (query) {
   }
 })
 
-var userAgent = 'Meteor'
-if (Meteor.release) userAgent += '/' + Meteor.release
+const userAgent = `Meteor${Meteor.release ? `/${Meteor.release}` : ''}`
 
-var getAccessToken = function (query) {
-  var config = ServiceConfiguration.configurations.findOne({service: 'intra42'})
+const getAccessToken = function (query) {
+  const config = ServiceConfiguration.configurations.findOne({service: name})
   if (!config) throw new ServiceConfiguration.ConfigError()
 
-  var response
+  let response
   try {
     response = HTTP.post('https://api.intra.42.fr/oauth/token', {
       headers: {Accept: 'application/json', 'User-Agent': userAgent},
@@ -29,35 +36,35 @@ var getAccessToken = function (query) {
         code: query.code,
         client_id: config.clientId,
         client_secret: OAuth.openSecret(config.secret),
-        redirect_uri: OAuth._redirectUri('intra42', config),
+        redirect_uri: OAuth._redirectUri(name, config),
         state: query.state,
         grant_type: 'authorization_code'
       }
     })
   } catch (err) {
-    console.log('TOTOTOTOTOTTOTOTOTOTTOTOTOTOT_------------------', query.code,
-    config.clientId,
-    OAuth.openSecret(config.secret),
-    OAuth._redirectUri('intra42', config),
-    query.state,
-    'authorization_code')
-    throw _.extend(new Error('Failed to complete OAuth handshake with Intranet 42. ' + err.message), {response: err.response})
+    const error = new Error('Failed to complete OAuth handshake with Intranet 42. ' + err.message)
+    error.response = err.response
+    throw error
   }
   if (response.data.error) {
     throw new Error('Failed to complete OAuth handshake with Intranet 42. ' + response.data.error)
   } else return response.data.access_token
 }
 
-var getIdentity = function (accessToken) {
+const getIdentity = function (accessToken) {
   try {
     return HTTP.get('https://api.intra.42.fr/v2/me', {
       headers: {'User-Agent': userAgent, Authorization: 'Bearer ' + accessToken}
     }).data
   } catch (err) {
-    throw _.extend(new Error('Failed to fetch identity from Intranet 42. ' + err.message), {response: err.response})
+    const error = new Error('Failed to fetch identity from Intranet 42. ' + err.message)
+    error.response = err.response
+    throw error
   }
 }
 
-Intra42.retrieveCredential = function (credentialToken, credentialSecret) {
-  return OAuth.retrieveCredential(credentialToken, credentialSecret)
+export const Intra42 = {
+  retrieveCredential: function (credentialToken, credentialSecret) {
+    return OAuth.retrieveCredential(credentialToken, credentialSecret)
+  }
 }
