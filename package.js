@@ -1,6 +1,6 @@
 Package.describe({
   summary: 'Intranet 42 OAuth flow',
-  version: '1.1.0',
+  version: '1.2.0',
   name: 'chap:intra42-oauth',
   git: 'https://github.com/marcchapeau/meteor-intra42-oauth'
 })

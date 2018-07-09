@@ -3,11 +3,6 @@ import { Meteor } from 'meteor/meteor'
 import { ServiceConfiguration } from 'meteor/service-configuration'
 import { HTTP } from 'meteor/http'
 
-// const settings = Meteor.settings
-// const app = settings.public && settings.public.intra42 && settings.public.intra42.app
-// let name = 'intra42'
-// if (app) name += `_${app}`
-
 OAuth.registerService('intra42', 2, null, function (query) {
   const accessToken = getAccessToken(query)
   const identity = getIdentity(accessToken)

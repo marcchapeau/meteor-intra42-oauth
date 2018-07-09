@@ -3,11 +3,6 @@ import { Random } from 'meteor/random'
 import { OAuth } from 'meteor/oauth'
 import { Meteor } from 'meteor/meteor'
 
-// const settings = Meteor.settings
-// const app = settings.public && settings.public.intra42 && settings.public.intra42.app
-// let name = 'intra42'
-// if (app) name += `_${app}`
-
 export const Intra42 = {
   requestCredential: function (options, credentialRequestCompleteCallback) {
     if (!credentialRequestCompleteCallback && typeof options === 'function') {
