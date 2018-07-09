@@ -3,12 +3,12 @@ import { Meteor } from 'meteor/meteor'
 import { ServiceConfiguration } from 'meteor/service-configuration'
 import { HTTP } from 'meteor/http'
 
-const settings = Meteor.settings
-const app = settings.public && settings.public.intra42 && settings.public.intra42.app
-let name = 'intra42'
-if (app) name += `_${app}`
+// const settings = Meteor.settings
+// const app = settings.public && settings.public.intra42 && settings.public.intra42.app
+// let name = 'intra42'
+// if (app) name += `_${app}`
 
-OAuth.registerService(name, 2, null, function (query) {
+OAuth.registerService('intra42', 2, null, function (query) {
   const accessToken = getAccessToken(query)
   const identity = getIdentity(accessToken)
   return {
@@ -25,9 +25,16 @@ OAuth.registerService(name, 2, null, function (query) {
 const userAgent = `Meteor${Meteor.release ? `/${Meteor.release}` : ''}`
 
 const getAccessToken = function (query) {
-  const config = ServiceConfiguration.configurations.findOne({service: name})
-  if (!config) throw new ServiceConfiguration.ConfigError()
-
+  let config = ServiceConfiguration.configurations.findOne({service: 'intra42'})
+  if (!config) {
+    throw new ServiceConfiguration.ConfigError()
+  } else if (config.multi) {
+    config = Meteor && Meteor.settings && Meteor.settings.private && Meteor.settings.private.intra42
+    if (config) {
+      config.loginStyle = 'redirect'
+      config.service = 'intra42'
+    }
+  }
   let response
   try {
     response = HTTP.post('https://api.intra.42.fr/oauth/token', {
@@ -36,7 +43,7 @@ const getAccessToken = function (query) {
         code: query.code,
         client_id: config.clientId,
         client_secret: OAuth.openSecret(config.secret),
-        redirect_uri: OAuth._redirectUri(name, config),
+        redirect_uri: OAuth._redirectUri('intra42', config),
         state: query.state,
         grant_type: 'authorization_code'
       }
